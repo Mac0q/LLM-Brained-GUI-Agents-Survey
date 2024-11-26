@@ -188,8 +188,7 @@
             if (lowerPlatform.includes("pc") || lowerPlatform.includes("linux") || lowerPlatform.includes("windows") || lowerPlatform.includes("mac") || lowerPlatform.includes("desktop") || lowerPlatform.includes("computer")) isComputer = true;
 
             const result = new Set();
-            if (isWeb && isMobile && isComputer) result.add("cross platform");
-            else if ((isWeb && isMobile) || (isWeb && isComputer) || (isMobile && isComputer)) result.add("cross platform");
+            if ((isWeb && isMobile && isComputer) || (isWeb && isMobile) || (isWeb && isComputer) || (isMobile && isComputer)) result.add("cross platform");
             if (isWeb) result.add("web");
             if (isMobile) result.add("mobile");
             if (isComputer) result.add("computer");
