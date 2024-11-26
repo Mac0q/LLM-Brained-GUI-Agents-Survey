@@ -80,6 +80,10 @@
         .clickable-wrapper:hover .click-hint {
             color: #007bff;
         }
+
+        mark {
+            background-color: yellow;
+        }
     </style>
 </head>
 <body>
@@ -169,6 +173,7 @@
             if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
             return await response.json();
         }
+
         function mapPlatform(platform) {
             if (!platform) return [];
 
@@ -191,6 +196,11 @@
             return Array.from(result);
         }
 
+        function highlightText(text) {
+            if (!keywordFilter) return text;
+            const regex = new RegExp(`(${keywordFilter})`, 'gi');
+            return text.replace(regex, '<mark>$1</mark>');
+        }
 
         function updateTable(filteredData) {
             const sortedData = filteredData.sort((a, b) => {
@@ -204,12 +214,13 @@
 
             const paginatedData = sortedData.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
-            const headers = ["Category", "Name", "Platform", "Date", "Highlight", "Code_Url"];
+            const headers = ["Category", "Title", "Platform", "Date", "Highlight", "Code_Url"];
             const tableHeader = headers.map(header => {
                 const arrow = currentSort.column === header
                     ? (currentSort.ascending ? " ▲" : " ▼")
                     : "";
-                return `<th class="sortable" data-column="${header}">${header.replace("_Url", " Link")}${arrow}</th>`;
+                const headerId = header === "Category" ? ' id="category-column"' : "";
+                return `<th${headerId} class="sortable" data-column="${header}">${header.replace("_Url", " Link")}${arrow}</th>`;
             }).join("");
 
             document.getElementById("table-header").innerHTML = `<tr>${tableHeader}</tr>`;
@@ -220,14 +231,14 @@
                     <td>
                         ${row.Paper_Url && row.Paper_Url !== "/"
                             ? `<div class="clickable-wrapper title-wrapper">
-                                <a href="${row.Paper_Url}" target="_blank">${row.Name || "Unnamed Paper"}</a>
+                                <a href="${row.Paper_Url}" target="_blank">${highlightText(row.Name || "Unnamed Paper")}</a>
                                 <span class="click-hint"></span>
                                </div>` 
-                            : row.Name || "Unnamed Paper"}
+                            : highlightText(row.Name || "Unnamed Paper")}
                     </td>
                     <td>${row.Platform || "N/A"}</td>
                     <td>${row.Date || "N/A"}</td>
-                    <td>${row.Highlight || "N/A"}</td>
+                    <td>${highlightText(row.Highlight || "N/A")}</td>
                     <td>
                         ${row.Code_Url 
                             ? `<div class="clickable-wrapper code-link-wrapper">
@@ -242,6 +253,13 @@
             document.getElementById("table-body").innerHTML = rows;
 
             document.getElementById("category-column").classList.toggle("hidden", currentCategory !== "");
+            document.querySelectorAll("#table-body tr").forEach(row => {
+                const categoryCell = row.querySelector("td:first-child");
+                if (categoryCell) {
+                    categoryCell.classList.toggle("hidden", currentCategory !== "");
+                }
+            });
+
             updatePagination(filteredData.length);
 
             document.querySelectorAll(".sortable").forEach(header => {
@@ -275,10 +293,11 @@
 
             const filtered = data.filter(row => {
                 const categoryMatch = !currentCategory || row.Category === currentCategory;
-                // const platformMatch = !platformFilter || (row.Platform && row.Platform.toLowerCase().includes(platformFilter));
                 const mappedPlatform = mapPlatform(row.Platform);
                 const platformMatch = !platformFilter || mappedPlatform.includes(platformFilter);
-                const keywordMatch = !keywordFilter || (row.Highlight && row.Highlight.toLowerCase().includes(keywordFilter));
+                const keywordInName = row.Name && row.Name.toLowerCase().includes(keywordFilter);
+                const keywordInHighlight = row.Highlight && row.Highlight.toLowerCase().includes(keywordFilter);
+                const keywordMatch = !keywordFilter || keywordInName || keywordInHighlight;
 
                 return categoryMatch && platformMatch && keywordMatch;
             });
@@ -289,21 +308,37 @@
         document.querySelectorAll(".menu-item").forEach(item => {
             item.addEventListener("click", event => {
                 document.querySelectorAll(".menu-item").forEach(el => el.classList.remove("active"));
-                event.target.classList.add("active");
-                currentCategory = event.target.dataset.category;
+                event.currentTarget.classList.add("active");
+                currentCategory = event.currentTarget.dataset.category;
                 currentPage = 1;
                 filterData();
             });
         });
 
-        document.getElementById("filter-platform").addEventListener("change", filterData);
-        document.getElementById("filter-keyword").addEventListener("input", filterData);
+        document.getElementById("filter-platform").addEventListener("change", () => {
+            currentPage = 1;
+            filterData();
+        });
+        document.getElementById("filter-keyword").addEventListener("input", () => {
+            currentPage = 1;
+            filterData();
+        });
         document.getElementById("pagination").addEventListener("click", event => {
             if (event.target.tagName === "A") {
                 event.preventDefault();
                 currentPage = parseInt(event.target.dataset.page);
                 filterData();
             }
+        });
+
+        document.getElementById("reset-filters").addEventListener("click", () => {
+            document.getElementById("filter-platform").value = "";
+            document.getElementById("filter-keyword").value = "";
+            currentCategory = "";
+            currentPage = 1;
+            document.querySelectorAll(".menu-item").forEach(el => el.classList.remove("active"));
+            document.querySelector(".menu-item[data-category='']").classList.add("active");
+            filterData();
         });
 
         loadData();
