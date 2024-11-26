@@ -186,6 +186,7 @@
             if (lowerPlatform.includes("web") || lowerPlatform.includes("browser")) isWeb = true;
             if (lowerPlatform.includes("mobile") || lowerPlatform.includes("android") || lowerPlatform.includes("ios") || lowerPlatform.includes("apple")) isMobile = true;
             if (lowerPlatform.includes("pc") || lowerPlatform.includes("linux") || lowerPlatform.includes("windows") || lowerPlatform.includes("mac") || lowerPlatform.includes("desktop") || lowerPlatform.includes("computer")) isComputer = true;
+            if (lowerPlatform.includes("general")) isWeb = isMobile = isComputer = true;
 
             const result = new Set();
             if ((isWeb && isMobile && isComputer) || (isWeb && isMobile) || (isWeb && isComputer) || (isMobile && isComputer)) result.add("cross platform");
