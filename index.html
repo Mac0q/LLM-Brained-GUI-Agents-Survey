@@ -8,6 +8,7 @@
         body {
             display: flex;
         }
+        /* Sidebar styles */
         .sidebar {
             width: 250px;
             height: 100vh;
@@ -36,6 +37,7 @@
             background-color: #007bff;
             color: #fff;
         }
+        /* Content area styles */
         .content {
             margin-left: 270px;
             padding: 20px;
@@ -117,12 +119,14 @@
     </div>
 
     <script>
+        // Data storage and filters
         let data = [];
         let currentCategory = "";
         let currentPage = 1;
         const itemsPerPage = 15;
         let keywordFilter = "";
 
+        // Load JSON data for all categories
         async function loadData() {
             const jsonFiles = [
                 { file: 'survey.json', category: 'survey' },
@@ -146,15 +150,18 @@
                 filterData();
             } catch (error) {
                 console.error('Error loading data:', error);
+                alert('Failed to load data. Please check the JSON files or network.');
             }
         }
 
+        // Fetch data from JSON file
         async function fetchData(fileName) {
             const response = await fetch(fileName);
             if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
             return await response.json();
         }
 
+        // Update table with filtered data
         function updateTable(filteredData) {
             const paginatedData = filteredData.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
@@ -175,11 +182,12 @@
 
             document.getElementById("table-body").innerHTML = rows;
 
-            // Hide or show the Category column based on the current category filter
+            // Show or hide Category column
             document.getElementById("category-column").classList.toggle("hidden", currentCategory !== "");
             updatePagination(filteredData.length);
         }
 
+        // Update pagination
         function updatePagination(totalItems) {
             const totalPages = Math.ceil(totalItems / itemsPerPage);
             const pagination = Array.from({ length: totalPages }, (_, i) => `
@@ -191,6 +199,7 @@
             document.getElementById("pagination").innerHTML = pagination;
         }
 
+        // Filter data based on category, platform, and keyword
         function filterData() {
             const platformFilter = document.getElementById("filter-platform").value.toLowerCase();
             keywordFilter = document.getElementById("filter-keyword").value.toLowerCase();
@@ -206,6 +215,7 @@
             updateTable(filtered);
         }
 
+        // Event listeners for filters and pagination
         document.querySelectorAll(".menu-item").forEach(item => {
             item.addEventListener("click", event => {
                 document.querySelectorAll(".menu-item").forEach(el => el.classList.remove("active"));
@@ -226,6 +236,7 @@
             }
         });
 
+        // Load data on page load
         loadData();
     </script>
 </body>
