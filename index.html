@@ -223,13 +223,14 @@
 
             const paginatedData = sortedData.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
-            const headers = ["Category", "Title", "Platform", "Date", "Highlight", "Code_Url"];
+            const headers = currentCategory === "" 
+                ? ["Category", "Title", "Platform", "Date", "Highlight", "Code_Url"] 
+                : ["Title", "Platform", "Date", "Highlight", "Code_Url"];
             const tableHeader = headers.map(header => {
                 const arrow = currentSort.column === header
                     ? (currentSort.ascending ? " ▲" : " ▼")
                     : "";
-                const headerId = header === "Category" ? ' id="category-column"' : "";
-                return `<th${headerId} class="sortable" data-column="${header}">${header.replace("_Url", " Link")}${arrow}</th>`;
+                return `<th class="sortable" data-column="${header}">${header.replace("_Url", " Link")}${arrow}</th>`;
             }).join("");
 
             document.getElementById("table-header").innerHTML = `<tr>${tableHeader}</tr>`;
@@ -265,17 +266,6 @@
 
             document.getElementById("table-body").innerHTML = rows;
 
-            const categoryHeader = document.getElementById("category-column");
-            if (categoryHeader) {
-                categoryHeader.classList.toggle("hidden", currentCategory !== "");
-            }
-            document.querySelectorAll("#table-body tr").forEach(row => {
-                const categoryCell = row.querySelector("td:first-child");
-                if (categoryCell) {
-                    categoryCell.classList.toggle("hidden", currentCategory !== "");
-                }
-            });
-
             updatePagination(filteredData.length);
 
             document.querySelectorAll(".sortable").forEach(header => {
@@ -297,14 +287,14 @@
             const totalPages = Math.ceil(totalItems / itemsPerPage);
             const pagination = [];
 
-
+            // Previous button
             pagination.push(`
                 <li class="page-item ${currentPage === 1 ? "disabled" : ""}">
                     <a class="page-link" href="#" data-page="${currentPage - 1}">Previous</a>
                 </li>
             `);
 
-
+            // Page numbers
             for (let i = 1; i <= totalPages; i++) {
                 pagination.push(`
                     <li class="page-item ${currentPage === i ? "active" : ""}">
@@ -313,7 +303,7 @@
                 `);
             }
 
-
+            // Next button
             pagination.push(`
                 <li class="page-item ${currentPage === totalPages ? "disabled" : ""}">
                     <a class="page-link" href="#" data-page="${currentPage + 1}">Next</a>
@@ -363,7 +353,19 @@
             if (event.target.tagName === "A") {
                 event.preventDefault();
                 const newPage = parseInt(event.target.dataset.page);
-                if (!isNaN(newPage) && newPage > 0) {
+                const totalPages = Math.ceil(data.filter(row => {
+                    const platformFilter = document.getElementById("filter-platform").value.toLowerCase();
+                    keywordFilter = document.getElementById("filter-keyword").value.toLowerCase();
+                    const categoryMatch = !currentCategory || row.Category === currentCategory;
+                    const mappedPlatform = mapPlatform(row.Platform);
+                    const platformMatch = !platformFilter || mappedPlatform.includes(platformFilter);
+                    const keywordInName = row.Name && row.Name.toLowerCase().includes(keywordFilter);
+                    const keywordInHighlight = row.Highlight && row.Highlight.toLowerCase().includes(keywordFilter);
+                    const keywordMatch = !keywordFilter || keywordInName || keywordInHighlight;
+                    return categoryMatch && platformMatch && keywordMatch;
+                }).length / itemsPerPage);
+
+                if (!isNaN(newPage) && newPage > 0 && newPage <= totalPages) {
                     currentPage = newPage;
                     filterData();
                 }
