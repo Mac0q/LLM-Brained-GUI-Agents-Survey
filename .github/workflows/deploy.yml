@@ -23,8 +23,8 @@ jobs:
     - name: Build website
       run: |
         mkdir -p build
-        cp index.html build/
-        cp data.json build/
+        cp *.html build/
+        cp *.json build/
 
     - name: Deploy to GitHub Pages
       uses: JamesIves/github-pages-deploy-action@v4
