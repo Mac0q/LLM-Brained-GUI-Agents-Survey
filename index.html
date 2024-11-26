@@ -45,6 +45,9 @@
             cursor: pointer;
             text-decoration: underline;
         }
+        .hidden {
+            display: none !important;
+        }
     </style>
 </head>
 <body>
@@ -55,10 +58,10 @@
         <div class="menu-item" data-category="survey">Survey</div>
         <div class="menu-item" data-category="benchmark">Benchmark</div>
         <div class="menu-item" data-category="dataset">Dataset</div>
+        <div class="menu-item" data-category="models">Models</div>
         <div class="menu-item" data-category="framework">Framework</div>
         <div class="menu-item" data-category="gui-test">Application: GUI Test</div>
         <div class="menu-item" data-category="virtual assistant">Application: Virtual Assistant</div>
-        <div class="menu-item" data-category="models">Models</div>
     </div>
 
     <!-- Content -->
@@ -90,7 +93,7 @@
         <table class="table table-bordered table-striped">
             <thead id="table-header">
                 <tr>
-                    <th class="sortable" data-column="Category">Category</th>
+                    <th id="category-column" class="sortable" data-column="Category">Category</th>
                     <th class="sortable" data-column="Name">Title</th>
                     <th class="sortable" data-column="Platform">Platform</th>
                     <th class="sortable" data-column="Date">Date</th>
@@ -157,7 +160,7 @@
 
             const rows = paginatedData.map(row => `
                 <tr>
-                    <td>${row.Category || "N/A"}</td>
+                    ${currentCategory === "" ? `<td>${row.Category || "N/A"}</td>` : ""}
                     <td>${row.Paper_Url 
                         ? `<a href="${row.Paper_Url}" target="_blank">${row.Name || "Unnamed Paper"}</a>` 
                         : row.Name || "Unnamed Paper"}</td>
@@ -171,6 +174,9 @@
             `).join("");
 
             document.getElementById("table-body").innerHTML = rows;
+
+            // Hide or show the Category column based on the current category filter
+            document.getElementById("category-column").classList.toggle("hidden", currentCategory !== "");
             updatePagination(filteredData.length);
         }
 
