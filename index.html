@@ -161,7 +161,7 @@
             const rows = paginatedData.map(row => `
                 <tr>
                     ${currentCategory === "" ? `<td>${row.Category || "N/A"}</td>` : ""}
-                    <td>${row.Paper_Url 
+                    <td>${row.Paper_Url && row.Paper_Url !== "/"
                         ? `<a href="${row.Paper_Url}" target="_blank">${row.Name || "Unnamed Paper"}</a>` 
                         : row.Name || "Unnamed Paper"}</td>
                     <td>${row.Platform || "N/A"}</td>
