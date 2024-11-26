@@ -119,16 +119,7 @@
         </div>
         
         <table class="table table-bordered table-striped">
-            <thead id="table-header">
-                <tr>
-                    <th id="category-column" class="sortable" data-column="Category">Category</th>
-                    <th class="sortable" data-column="Name">Title</th>
-                    <th class="sortable" data-column="Platform">Platform</th>
-                    <th class="sortable" data-column="Date">Date</th>
-                    <th class="sortable" data-column="Highlight">Highlight</th>
-                    <th class="sortable" data-column="Code_Url">Code Link</th>
-                </tr>
-            </thead>
+            <thead id="table-header"></thead>
             <tbody id="table-body"></tbody>
         </table>
         
@@ -145,6 +136,7 @@
         let currentPage = 1;
         const itemsPerPage = 15;
         let keywordFilter = "";
+        let currentSort = { column: "Date", ascending: true };
 
         async function loadData() {
             const jsonFiles = [
@@ -180,7 +172,26 @@
         }
 
         function updateTable(filteredData) {
-            const paginatedData = filteredData.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+            const sortedData = filteredData.sort((a, b) => {
+                const col = currentSort.column;
+                const order = currentSort.ascending ? 1 : -1;
+
+                if (a[col] > b[col]) return 1 * order;
+                if (a[col] < b[col]) return -1 * order;
+                return 0;
+            });
+
+            const paginatedData = sortedData.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
+            const headers = ["Category", "Name", "Platform", "Date", "Highlight", "Code_Url"];
+            const tableHeader = headers.map(header => {
+                const arrow = currentSort.column === header
+                    ? (currentSort.ascending ? " ▲" : " ▼")
+                    : "";
+                return `<th class="sortable" data-column="${header}">${header.replace("_Url", " Link")}${arrow}</th>`;
+            }).join("");
+
+            document.getElementById("table-header").innerHTML = `<tr>${tableHeader}</tr>`;
 
             const rows = paginatedData.map(row => `
                 <tr>
@@ -189,7 +200,7 @@
                         ${row.Paper_Url && row.Paper_Url !== "/"
                             ? `<div class="clickable-wrapper title-wrapper">
                                 <a href="${row.Paper_Url}" target="_blank">${row.Name || "Unnamed Paper"}</a>
-                                <span class="click-hint"> </span>
+                                <span class="click-hint"></span>
                                </div>` 
                             : row.Name || "Unnamed Paper"}
                     </td>
@@ -200,7 +211,7 @@
                         ${row.Code_Url 
                             ? `<div class="clickable-wrapper code-link-wrapper">
                                 <a href="${row.Code_Url}" target="_blank">Code Link</a>
-                                <span class="click-hint"> </span>
+                                <span class="click-hint"></span>
                                </div>` 
                             : "N/A"}
                     </td>
@@ -211,6 +222,19 @@
 
             document.getElementById("category-column").classList.toggle("hidden", currentCategory !== "");
             updatePagination(filteredData.length);
+
+            document.querySelectorAll(".sortable").forEach(header => {
+                header.addEventListener("click", () => {
+                    const column = header.getAttribute("data-column");
+                    if (currentSort.column === column) {
+                        currentSort.ascending = !currentSort.ascending;
+                    } else {
+                        currentSort.column = column;
+                        currentSort.ascending = true;
+                    }
+                    filterData();
+                });
+            });
         }
 
         function updatePagination(totalItems) {
