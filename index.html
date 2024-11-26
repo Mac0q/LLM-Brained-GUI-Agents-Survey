@@ -8,7 +8,7 @@
         body {
             display: flex;
         }
-        /* Sidebar styles */
+
         .sidebar {
             width: 250px;
             height: 100vh;
@@ -20,40 +20,69 @@
             box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
             overflow-y: auto;
         }
+
         .sidebar h4 {
             margin-bottom: 20px;
             text-align: center;
         }
+
         .sidebar .menu-item {
             margin: 10px 0;
             cursor: pointer;
             padding: 10px;
             border-radius: 5px;
         }
+
         .sidebar .menu-item:hover {
             background-color: #e9ecef;
         }
+
         .sidebar .menu-item.active {
             background-color: #007bff;
             color: #fff;
         }
-        /* Content area styles */
+
         .content {
             margin-left: 270px;
             padding: 20px;
             flex: 1;
         }
+
         th.sortable:hover {
             cursor: pointer;
             text-decoration: underline;
         }
+
         .hidden {
             display: none !important;
+        }
+
+        .title-wrapper {
+            background-color: #fff4e6;
+            padding: 5px;
+            border-radius: 5px;
+            display: inline-block;
+        }
+
+        .code-link-wrapper {
+            background-color: #ffeef0;
+            padding: 5px;
+            border-radius: 5px;
+            display: inline-block;
+        }
+
+        .click-hint {
+            font-size: 0.9rem;
+            color: #6c757d;
+            margin-left: 5px;
+        }
+
+        .clickable-wrapper:hover .click-hint {
+            color: #007bff;
         }
     </style>
 </head>
 <body>
-    <!-- Sidebar -->
     <div class="sidebar">
         <h4>Categories</h4>
         <div class="menu-item active" data-category="">All Categories</div>
@@ -66,11 +95,9 @@
         <div class="menu-item" data-category="virtual assistant">Application: Virtual Assistant</div>
     </div>
 
-    <!-- Content -->
     <div class="content">
         <h1 class="text-center mb-4">GUI Research Papers</h1>
 
-        <!-- Filters -->
         <div class="row mb-3">
             <div class="col-md-4">
                 <label for="filter-platform" class="form-label">Filter by Platform:</label>
@@ -91,7 +118,6 @@
             </div>
         </div>
         
-        <!-- Papers Table -->
         <table class="table table-bordered table-striped">
             <thead id="table-header">
                 <tr>
@@ -103,30 +129,23 @@
                     <th class="sortable" data-column="Code_Url">Code Link</th>
                 </tr>
             </thead>
-            <tbody id="table-body">
-                <!-- Data Rows -->
-            </tbody>
+            <tbody id="table-body"></tbody>
         </table>
         
-        <!-- Pagination -->
         <div class="d-flex justify-content-center my-3">
             <nav>
-                <ul class="pagination" id="pagination">
-                    <!-- Pagination Items -->
-                </ul>
+                <ul class="pagination" id="pagination"></ul>
             </nav>
         </div>
     </div>
 
     <script>
-        // Data storage and filters
         let data = [];
         let currentCategory = "";
         let currentPage = 1;
         const itemsPerPage = 15;
         let keywordFilter = "";
 
-        // Load JSON data for all categories
         async function loadData() {
             const jsonFiles = [
                 { file: 'survey.json', category: 'survey' },
@@ -154,40 +173,46 @@
             }
         }
 
-        // Fetch data from JSON file
         async function fetchData(fileName) {
             const response = await fetch(fileName);
             if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
             return await response.json();
         }
 
-        // Update table with filtered data
         function updateTable(filteredData) {
             const paginatedData = filteredData.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
             const rows = paginatedData.map(row => `
                 <tr>
                     ${currentCategory === "" ? `<td>${row.Category || "N/A"}</td>` : ""}
-                    <td>${row.Paper_Url && row.Paper_Url !== "/"
-                        ? `<a href="${row.Paper_Url}" target="_blank">${row.Name || "Unnamed Paper"}</a>` 
-                        : row.Name || "Unnamed Paper"}</td>
+                    <td>
+                        ${row.Paper_Url && row.Paper_Url !== "/"
+                            ? `<div class="clickable-wrapper title-wrapper">
+                                <a href="${row.Paper_Url}" target="_blank">${row.Name || "Unnamed Paper"}</a>
+                                <span class="click-hint"> (Click to view)</span>
+                               </div>` 
+                            : row.Name || "Unnamed Paper"}
+                    </td>
                     <td>${row.Platform || "N/A"}</td>
                     <td>${row.Date || "N/A"}</td>
                     <td>${row.Highlight || "N/A"}</td>
-                    <td>${row.Code_Url 
-                        ? `<a href="${row.Code_Url}" target="_blank">Code Link</a>` 
-                        : "N/A"}</td>
+                    <td>
+                        ${row.Code_Url 
+                            ? `<div class="clickable-wrapper code-link-wrapper">
+                                <a href="${row.Code_Url}" target="_blank">Code Link</a>
+                                <span class="click-hint"> (Click to view)</span>
+                               </div>` 
+                            : "N/A"}
+                    </td>
                 </tr>
             `).join("");
 
             document.getElementById("table-body").innerHTML = rows;
 
-            // Show or hide Category column
             document.getElementById("category-column").classList.toggle("hidden", currentCategory !== "");
             updatePagination(filteredData.length);
         }
 
-        // Update pagination
         function updatePagination(totalItems) {
             const totalPages = Math.ceil(totalItems / itemsPerPage);
             const pagination = Array.from({ length: totalPages }, (_, i) => `
@@ -199,7 +224,6 @@
             document.getElementById("pagination").innerHTML = pagination;
         }
 
-        // Filter data based on category, platform, and keyword
         function filterData() {
             const platformFilter = document.getElementById("filter-platform").value.toLowerCase();
             keywordFilter = document.getElementById("filter-keyword").value.toLowerCase();
@@ -215,7 +239,6 @@
             updateTable(filtered);
         }
 
-        // Event listeners for filters and pagination
         document.querySelectorAll(".menu-item").forEach(item => {
             item.addEventListener("click", event => {
                 document.querySelectorAll(".menu-item").forEach(el => el.classList.remove("active"));
@@ -236,7 +259,6 @@
             }
         });
 
-        // Load data on page load
         loadData();
     </script>
 </body>
