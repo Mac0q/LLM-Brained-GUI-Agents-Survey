@@ -170,6 +170,28 @@
             if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
             return await response.json();
         }
+        function mapPlatform(platform) {
+            if (!platform) return [];
+
+            const lowerPlatform = platform.toLowerCase();
+
+            let isWeb = false;
+            let isMobile = false;
+            let isComputer = false;
+
+            if (lowerPlatform.includes("web") || lowerPlatform.includes("browser")) isWeb = true;
+            if (lowerPlatform.includes("mobile") || lowerPlatform.includes("android") || lowerPlatform.includes("ios") || lowerPlatform.includes("apple")) isMobile = true;
+            if (lowerPlatform.includes("pc") || lowerPlatform.includes("linux") || lowerPlatform.includes("windows") || lowerPlatform.includes("mac") || lowerPlatform.includes("desktop") || lowerPlatform.includes("computer")) isComputer = true;
+
+            const result = new Set();
+            if ((isWeb && isMobile && isComputer) || (isMobile && isComputer) || (isWeb && isComputer)|| (isWeb && isMobile)) result.add("cross platform");
+            if (isWeb) result.add("web");
+            if (isMobile) result.add("mobile");
+            if (isComputer) result.add("computer");
+
+            return Array.from(result);
+        }
+
 
         function updateTable(filteredData) {
             const sortedData = filteredData.sort((a, b) => {
@@ -254,7 +276,9 @@
 
             const filtered = data.filter(row => {
                 const categoryMatch = !currentCategory || row.Category === currentCategory;
-                const platformMatch = !platformFilter || (row.Platform && row.Platform.toLowerCase().includes(platformFilter));
+                // const platformMatch = !platformFilter || (row.Platform && row.Platform.toLowerCase().includes(platformFilter));
+                const mappedPlatform = mapPlatform(row.Platform);
+                const platformMatch = !platformFilter || mappedPlatform.includes(platformFilter);
                 const keywordMatch = !keywordFilter || (row.Highlight && row.Highlight.toLowerCase().includes(keywordFilter));
 
                 return categoryMatch && platformMatch && keywordMatch;
