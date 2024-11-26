@@ -88,7 +88,7 @@
         "Code_Url": "https://yaoz720.github.io/WebPilot/"
     },
     {
-        "Name": "Beyond Browsing: API-Based Web Agents",
+        "Name": "Beyond Browsing: API-based Web Agents",
         "Platform": "Web",
         "Date": "October 2024",
         "Paper_Url": "http://arxiv.org/abs/2410.16464v1",
@@ -96,7 +96,7 @@
         "Code_Url": "https://github.com/yueqis/API-Based-Agent"
     },
     {
-        "Name": "AgentOccam: A Simple Yet Strong Baseline for LLM-Based Web Agents",
+        "Name": "AgentOccam: A Simple Yet Strong Baseline for LLM-based Web Agents",
         "Platform": "Web",
         "Date": "October 2024",
         "Paper_Url": "http://arxiv.org/abs/2410.13825v1",
@@ -136,7 +136,7 @@
         "Code_Url": "/"
     },
     {
-        "Name": "Is Your LLM Secretly a World Model of the Internet? Model-Based Planning for Web Agents",
+        "Name": "Is Your LLM Secretly a World Model of the Internet? Model-based Planning for Web Agents",
         "Platform": "Web",
         "Date": "November 2024",
         "Paper_Url": "http://arxiv.org/abs/2411.06559v1",

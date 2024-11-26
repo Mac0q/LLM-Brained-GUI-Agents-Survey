@@ -48,7 +48,7 @@
         "Highlight": "A survey on the use of computer vision for software engineering."
     },
     {
-        "Name": "Vision-Based Mobile App GUI Testing: A Survey",
+        "Name": "Vision-based Mobile App GUI Testing: A Survey",
         "Date": "October 2023",
         "Paper_Url": "https://arxiv.org/abs/2310.13518",
         "Highlight": "A survey on using computer for mobile app GUI testing."
@@ -96,7 +96,7 @@
         "Highlight": "A review on task automation with intelligent agents."
     },
     {
-        "Name": "An In-Depth Survey of Large Language Model-Based Artificial Intelligence Agents",
+        "Name": "An In-Depth Survey of Large Language Model-based Artificial Intelligence Agents",
         "Date": "September 2023",
         "Paper_Url": "https://arxiv.org/abs/2309.14365",
         "Highlight": "A survey of LLM-based agents."
@@ -138,7 +138,7 @@
         "Highlight": "A survey on LLM multi-agent systems, with their challenges and open problems."
     },
     {
-        "Name": "LLM-Based Multi-Agent Reinforcement Learning: Current and Future Directions",
+        "Name": "LLM-based Multi-Agent Reinforcement Learning: Current and Future Directions",
         "Date": "May 2024",
         "Paper_Url": "https://arxiv.org/abs/2405.11106",
         "Highlight": "A survey on LLM-based multi-agent reinforcement learning."

@@ -189,10 +189,10 @@
             if (lowerPlatform.includes("general")) isWeb = isMobile = isComputer = true;
 
             const result = new Set();
-            if ((isWeb && isMobile && isComputer) || (isWeb && isMobile) || (isWeb && isComputer) || (isMobile && isComputer)) result.add("cross platform");
-            if (isWeb) result.add("web");
-            if (isMobile) result.add("mobile");
-            if (isComputer) result.add("computer");
+            if ((isWeb && isMobile && isComputer) || (isWeb && isMobile) || (isWeb && isComputer) || (isMobile && isComputer)) result.add("Cross Platform");
+            if (isWeb) result.add("Web");
+            if (isMobile) result.add("Mobile");
+            if (isComputer) result.add("Computer");
 
             return Array.from(result);
         }
@@ -224,42 +224,45 @@
             const paginatedData = sortedData.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
             const headers = currentCategory === "" 
-                ? ["Category", "Title", "Platform", "Date", "Highlight", "Code_Url"] 
-                : ["Title", "Platform", "Date", "Highlight", "Code_Url"];
+                ? ["Paper collection of LLM Brained GUI Agent", "Platform", "Date", "Highlight", "Code_Url", "Category"] 
+                : ["Paper collection of LLM Brained GUI Agent", "Platform", "Date", "Highlight", "Code_Url"];
             const tableHeader = headers.map(header => {
                 const arrow = currentSort.column === header
                     ? (currentSort.ascending ? " ▲" : " ▼")
                     : "";
-                return `<th class="sortable" data-column="${header}">${header.replace("_Url", " Link")}${arrow}</th>`;
+                return `<th class="sortable" data-column="${header}">${header.replace("Code_Url", "Project Link")}${arrow}</th>`;
             }).join("");
 
             document.getElementById("table-header").innerHTML = `<tr>${tableHeader}</tr>`;
 
             const rows = paginatedData.map(row => {
                 const mappedPlatforms = mapPlatform(row.Platform || "").join(", ");
-                
+                const titleLink = row.Paper_Url && row.Paper_Url !== "/" 
+                    ? row.Paper_Url 
+                    : row.Code_Url || "#";
+
                 return `
                     <tr>
-                        ${currentCategory === "" ? `<td>${row.Category || "N/A"}</td>` : ""}
                         <td>
-                            ${row.Paper_Url && row.Paper_Url !== "/"
-                                ? `<div class="clickable-wrapper title-wrapper">
-                                    <a href="${row.Paper_Url}" target="_blank">${highlightText(row.Name || "Unnamed Paper")}</a>
+                            ${titleLink !== "#" ? 
+                                `<div class="clickable-wrapper title-wrapper">
+                                    <a href="${titleLink}" target="_blank">${highlightText(row.Name || "Unnamed Paper")}</a>
                                     <span class="click-hint"></span>
-                                </div>` 
-                                : highlightText(row.Name || "Unnamed Paper")}
+                                </div>` : 
+                                highlightText(row.Name || "Unnamed Paper")}
                         </td>
                         <td>${mappedPlatforms || "N/A"}</td>
                         <td>${row.Date || "N/A"}</td>
                         <td>${highlightText(row.Highlight || "N/A")}</td>
                         <td>
-                            ${row.Code_Url 
-                                ? `<div class="clickable-wrapper code-link-wrapper">
+                            ${row.Code_Url ? 
+                                `<div class="clickable-wrapper code-link-wrapper">
                                     <a href="${row.Code_Url}" target="_blank">Code Link</a>
                                     <span class="click-hint"></span>
-                                </div>` 
-                                : "N/A"}
+                                </div>` : 
+                                "N/A"}
                         </td>
+                        ${currentCategory === "" ? `<td>${row.Category || "N/A"}</td>` : ""}
                     </tr>
                 `;
             }).join("");
